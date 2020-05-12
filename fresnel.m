@@ -18,7 +18,7 @@ function[rss rps rsp rpp]=fresnel(theta,phi,MM)
   else
   end; 
 
-  kp=sin(theta);   % the code works for kp>1 (evanescent waves)
+  kp=sin(theta); 
   % first find kz inside the material 
   kx=kp*cos(phi); ky=kp*sin(phi);
 
@@ -29,7 +29,7 @@ function[rss rps rsp rpp]=fresnel(theta,phi,MM)
   else
   end
   
-  if isdiag(MM(1:3,1:3)) && isdiag(MM(4:6,4:6)) && 0
+  if isdiag(MM(1:3,1:3)) && isdiag(MM(4:6,4:6)) && ~any(xi(:)) && 0
     epm=MM(1,1); mum=MM(4,4);   
     ks=sqrt(epm*mum-kx^2-ky^2);
     if imag(ks)>0   % so that inside the medium the solution doesnt grow with |z-z0|
@@ -40,10 +40,9 @@ function[rss rps rsp rpp]=fresnel(theta,phi,MM)
   else
     % search for solution around randomly distributed initial points 
     m=1;
-    Nk=20;   % number of random points  
+    Nk=25;   % number of random points  
     km=max([epx,1.5*kp]);   % range of initial points to search for solutions of kz 
-	 % Increase Nk and km if all required solutions are not found.
-    % for hyperbolic media, finding all solutions can be tricky. change the parameters here 
+    % Increase Nk and km if all required solutions are not found. 
     kzr=-km+2*km*rand(1,Nk);
     kzi=-km+2*km*rand(1,Nk); % Im(kz) < 0 to avoid exponential growth inside the medium 
     % random distribution guarantees solution with less number of points than
@@ -57,9 +56,9 @@ function[rss rps rsp rpp]=fresnel(theta,phi,MM)
             x0=[kzr(j) kzi(l)];
             [x, fval]=fminsearch(@(x)matcond(MM,kx,ky,x),x0,opt);  % this works better than others e.g. fmincon,
             z=x(1)+1i*x(2);
-            if (fval<=-1e15) && (abs(z)<100) % && (x(2)<=0) 
-                % condition number singularity check (we want precise solution else nullspace is difficult to find)
-                % reasonable solution check 
+            if (fval<=-1e15) && (abs(z)<100) && (x(2)<=0) 
+                % condition number singularity check 
+                % reasonable solution (e.g. not 1e43) check
                 % only exponentially decaying solutions are allowed inside
                 % the medium (z<0) hence Im(kz)<0 
                    
@@ -69,7 +68,7 @@ function[rss rps rsp rpp]=fresnel(theta,phi,MM)
                         ks(m)=z;
                         m=m+1;
                     else 
-                        % drop the solution (uniquetol doesn't work well.)
+                        % drop the solution (uniquetol doesn't work well. we want very precise solutions here)
                     end
                 else
                     ks(m)=z; m=m+1;  % first ever solution 
@@ -81,8 +80,8 @@ function[rss rps rsp rpp]=fresnel(theta,phi,MM)
         end
     end
   end
-  kz=sort(ks,'ComparisonMethod','real');
-  kz=kz(1:length(kz)/2);  % select the first two -z-propagating solutions
+  %kz=sort(ks,'ComparisonMethod','real'); 
+  [~, idx]=sort(real(ks)); kz=ks(idx);	
   
   % if there is no solution of kz inside the medium then all light is
   % essentially reflected (Some crazy material might do this)
@@ -101,19 +100,24 @@ function[rss rps rsp rpp]=fresnel(theta,phi,MM)
     for l=1:size(f,2)
         % Make sure that the solution is divergence free 
         D=MM*f(:,l); kv=[kx ky kz(j)]; d1=kv*D(1:3); d2=kv*D(4:6);  % last two are div.D=0 and div.B=0
-        if (abs(d1)<1e-8) && (abs(d2)<1e-8)  % ensuring that divergence values are zero.  
+        if (abs(d1)<1e-8) && (abs(d2)<1e-8)  % Divergence values are extremely small 
             E(:,k)=f(:,l);  
             k=k+1;
         else
         end
     end
   end
-  %E
+  % E;
   
   % s-p polarized modes in vacuum 
   MMv=eye(6);   % material matrix 
   kz0=sqrt(1-kp^2);
-  % fields on the vacuum side of the geometry 
+  % Note that radiation=0 at infinity condition does not apply for vacuum
+  % since there we already have some boundary/initial conditions meaning
+  % the assumption that both incident and reflected fields exist. This is a
+  % scattering problem and not finding a mode problem. But inside the
+  % medium boundary conditions such as 0 radiation at infinity are
+  % required. 
   [esi epi]=findspvectors(kp,-kz0,phi,MMv);  % interface at z=0 so -kz0 is the incident wave
   [esr epr]=findspvectors(kp,kz0,phi,MMv);   % kz0 is the reflected wave 
 
@@ -172,7 +176,7 @@ function[E]=findfields(kx,ky,kz,MM)
   E=null(M);
   if isempty(E)
     disp('null command did not work. Using svd to compute the null basis');
-    [V, D]=eigs(M); 
+    [V, D]=eigs(M);
     [m idx]=min(abs(diag(D)));
     E=V(:,idx);
   else

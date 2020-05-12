@@ -174,7 +174,8 @@ function[kz,ad,bd,au,bu,s]=getkzEH(kp,phi,MM)
         end
     end
   end
-		    kz=sort(ks,'ComparisonMethod','real');
+			       %kz=sort(ks,'ComparisonMethod','real');
+  [~, idx]=sort(real(ks)); kz=ks(idx);	
   % waves going in negative z are listed first. 
   
   if (isempty(kz))
@@ -232,9 +233,14 @@ function[E]=findfields(kx,ky,kz,MM)
   kd=[0 -kz ky; kz 0 -kx; -ky kx 0;];
   MMk=[zeros(3) kd; -kd zeros(3)];
   M=MM+MMk;
-  % We might want to use svd here 
-  % [U S V]=svd(M,'econ')
   E=null(M);
+  if isempty(E)
+    disp('null command did not work. Using svd to compute the null basis');
+    [V, D]=eigs(M);
+    [m idx]=min(abs(diag(D)));
+    E=V(:,idx);
+  else
+  end
   return;
     
 function[y]=compare(A,z)

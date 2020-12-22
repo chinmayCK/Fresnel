@@ -94,10 +94,10 @@ function[rss rps rsp rpp]=fresnel_halfspace(theta,phi,MM)
   end
 
   % round off-extremely small values to zero 
-  rss=fresnelround(rss);    tss=fresnelround(tss);
-  rsp=fresnelround(rsp);    tsp=fresnelround(tsp);
-  rps=fresnelround(rps);    tps=fresnelround(tps);
-  rpp=fresnelround(rpp);    tpp=fresnelround(tpp);
+  rss=fresnelround(rss);   
+  rsp=fresnelround(rsp);    
+  rps=fresnelround(rps);    
+  rpp=fresnelround(rpp);    
 
   return;
 

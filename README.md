@@ -20,6 +20,6 @@ If you are interested in validating the spin-resolved Kirchhoff's laws derived i
    and for user-specified parameters in the same. You can change these parameters later on. The generated file will look
    like 'make_report.pdf' uploaded in this repository. 
    
-The above command generates multiple figures (around 20) each containing table of reflection and transmission coefficients. This figures are then published in the pdf. The code takes less than 1min to finish but the figure capture and publishing can take some time (tpyically less than 3minutes). 
+The above command generates multiple figures (around 20) each containing table of reflection and transmission coefficients. These figures are then published in the pdf. The code takes less than 1min to finish but capturing and publishing figures as a report can take some time (tpyically less than 3minutes). 
 
 Thank you. Hope this tool is useful for your research or project work.  

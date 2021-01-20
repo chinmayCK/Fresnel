@@ -1,6 +1,7 @@
 function[rss, rps, rsp, rpp, tss, tps, tsp, tpp]=fresnel_2layered_bottom(theta,phi,MM1,MM2,td)
 
   kp=sin(theta);
+  phi=phi+pi;   % incidence along (theta, phi) means the parallel wavevector makes an angle phi+pi with x-axis
   % please define materials MM1, MM2, and geometry td for this two layered slab
   N=length(td);
 

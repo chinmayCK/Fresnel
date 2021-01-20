@@ -25,7 +25,7 @@ function[rss, rps, rsp, rpp, tss, tps, tsp, tpp]=fresnel_film_bottom(theta,phi,M
   end;
   
   kp=sin(theta); 
-  
+  phi=phi+pi;   % incidence along (theta, phi) means the parallel wavevector makes an angle phi+pi with x-axis
 				% first find kz inside the material 
   kx=kp*cos(phi); ky=kp*sin(phi);
 

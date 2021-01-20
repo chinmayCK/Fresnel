@@ -21,6 +21,7 @@ function[rss rps rsp rpp]=fresnel_halfspace(theta,phi,MM)
   end; 
 
   kp=sin(theta);   % the code also works for kp>1 (evanescent waves)
+  phi=phi+pi;   % incidence along (theta, phi) means the parallel wavevector makes an angle phi+pi with x-axis
   % first find kz inside the material 
   kx=kp*cos(phi); ky=kp*sin(phi);
 

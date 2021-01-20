@@ -22,6 +22,7 @@ function[rss, rps, rsp, rpp, tss, tps, tsp, tpp]=fresnel_film_on_substrate(theta
   kz_slab=sqrt(ep_slab-kp^2);
   
   % first find kz inside the material and then the corresponding eigenstates
+  phi=phi+pi;   % incidence along (theta, phi) means the parallel wavevector makes an angle phi+pi with x-axis
   kx=kp*cos(phi); ky=kp*sin(phi);
 
   syms kzs;
